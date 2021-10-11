@@ -1,0 +1,28 @@
+﻿@using OrchardCore.Mvc.Utilities;
+@using OrchardCore.ContentManagement
+@using OrchardCore.ContentManagement.Metadata
+@using Microsoft.AspNetCore.Authorization;
+@inject IContentDefinitionManager ContentDefinitionManager
+@inject IAuthorizationService AuthorizationService
+@{ ContentItem contentItem = Model.ContentItem;
+                var contentTypeDefinition = ContentDefinitionManager.GetTypeDefinition(contentItem.ContentType);
+                var typeDisplayName = contentTypeDefinition?.DisplayName ?? contentItem.ContentType.CamelFriendly(); }
+
+<zone name="Header">
+    <div class="row">
+        <div class="col-12">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="~/">首页</a></li>
+                <li class="breadcrumb-item"><a asp-route-action="List" asp-route-area="OrchardCore.Contents" asp-route-contentTypeId="@contentItem.ContentItem.ContentType">@Html.Raw(typeDisplayName)</a></li>
+                <li class="breadcrumb-item active">详情</li>
+            </ol>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <h1 class="m-0 text-dark">@RenderTitleSegments(contentItem.DisplayText)</h1>
+        </div>
+    </div>
+</zone>
+
+@await DisplayAsync(Model)

@@ -1,0 +1,139 @@
+﻿@model ListGroupViewModel
+@inject OrchardCore.ContentManagement.Display.IContentItemDisplayManager ContentItemDisplayManager
+
+<script asp-name="bootstrap-select" depends-on="admin" at="Foot"></script>
+<style asp-src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/css/bootstrap-select.min.css"></style>
+
+<form method="post">
+<!-- Hidden submit button do not remove -->
+<input type="submit" name="submit.Filter" id="submitFilter" class="d-none" />
+<input type="submit" name="submit.BulkAction" class="d-none" />
+
+<div class="row bg-light ml-0 mr-0 filter p-2">
+    <div class="col-7 col-xl-4 pt-1 pb-1">
+        @await DisplayAsync(Model.Header.Search)
+    </div>
+    <div class="col-5 col-xl-8 pt-1 pb-1 d-flex justify-content-end">
+        @await DisplayAsync(Model.Header.Actions)
+        <div class="form-group mb-n1 filter">
+            <div class="btn-group">
+                <a class="btn btn-primary btn-sm left-btn" asp-action="Create" asp-controller="Admin"
+                   asp-route-id="@Model.ContentTypeDefinition.Name"
+                   asp-route-area="OrchardCore.Contents"
+                   asp-route-ListPart.ContainerId="@Model.ContentItem.ContentItemId"
+                   asp-route-ListPart.ContentType="@Model.ContentTypeDefinition.Name"
+                   asp-route-ListPart.EnableOrdering="false"
+                   asp-route-returnUrl="@FullRequestPath">
+                    @T["新建{0}", ""]
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ul class="list-group with-checkbox list-group-flush">
+	<li class="list-group-item">
+		<div class="row">
+			<div class="col">
+				@await DisplayAsync(Model.Header.Summary)
+			</div>
+            <div class="col d-flex justify-content-start flex-row-reverse">
+                @await DisplayAsync(Model.Header.Filters)
+            </div>
+		</div>
+	</li>
+	@if (Model.ContentItems.Count > 0)
+	{
+		@foreach (var contentItem in Model.ContentItems)
+		{
+            var contentItemSummary = await ContentItemDisplayManager.BuildDisplayAsync(contentItem, Model.Context.Updater, "SummaryAdmin");
+			<li class="list-group-item">
+				@await DisplayAsync(contentItemSummary)
+			</li>
+		}
+	}
+	else
+	{
+		<li class="list-group-item">
+			<div class="alert alert-info">
+				@T["未找到任何结果。"]
+			</div>
+		</li>
+	}
+	@if (Model.ContentItems.Count > 0)
+	{
+		<li class="list-group-item" style="border-bottom-width:0">
+			<div class="row">
+				<div class="col d-none d-sm-block">
+				</div>
+				<div class="col d-flex justify-content-center justify-content-lg-end">
+					@await DisplayAsync(Model.Pager)
+				</div>
+			</div>
+		</li>
+	}
+</ul>
+</form>
+
+<script at="Foot">
+    $(function () {
+        var actions = $("#actions");
+        var items = $("#items");
+        var filters = $(".filter");
+        var selectAllCtrl = $("#select-all");
+        var selectedItems = $("#selected-items");
+        var itemsCheckboxes = $(":checkbox[name='itemIds']");
+
+        @* This applies to all filter selectpickers on page. Add .nosubmit to not submit *@
+        $('.selectpicker:not(.nosubmit)').on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
+            $("[name='submit.Filter']").click();
+        });
+
+        $(".dropdown-menu .dropdown-item").filter(function () {
+            return $(this).data("action");
+        }).on("click", function () {
+            if ($(":checkbox[name='itemIds']:checked").length > 1) {
+                var $this = $(this);
+                confirmDialog({
+                    ...$this.data(), callback: function (r) {
+                        if (r) {
+                            $("[name='Options.BulkAction']").val($this.data("action"));
+                            $("[name='submit.BulkAction']").click();
+                        }
+                    }
+                });
+            }
+        });
+        function displayActionsOrFilters() {
+            if ($(":checkbox[name='itemIds']:checked").length > 1) {
+                actions.show();
+                filters.hide();
+                selectedItems.show();
+                items.hide();
+            }
+            else {
+                actions.hide();
+                filters.show();
+                selectedItems.hide();
+                items.show();
+            }
+        }
+
+        selectAllCtrl.click(function(){
+            itemsCheckboxes.not(this).prop("checked", this.checked);
+            selectedItems.text($(":checkbox[name='itemIds']:checked").length + ' @T["selected"]');
+            displayActionsOrFilters();
+        });
+
+        itemsCheckboxes.on("click", function () {
+            var itemsCount = $(":checkbox[name='itemIds']").length;
+            var selectedItemsCount = $(":checkbox[name='itemIds']:checked").length;
+
+            selectAllCtrl.prop("checked", selectedItemsCount == itemsCount);
+            selectAllCtrl.prop("indeterminate", selectedItemsCount > 0 && selectedItemsCount < itemsCount);
+
+            selectedItems.text(selectedItemsCount + ' @T["selected"]');
+            displayActionsOrFilters();
+        });
+    })
+</script>

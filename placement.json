@@ -1,0 +1,14 @@
+﻿{
+  "ListPartDetailAdmin": [
+    {
+      "displayType": "DetailAdmin",
+      "place": "-"
+    }
+  ],
+  "ListPartSummaryAdmin": [
+    {
+      "displayType": "SummaryAdmin",
+      "place": "-"
+    }
+  ]
+}

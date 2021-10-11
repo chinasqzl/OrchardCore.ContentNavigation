@@ -1,0 +1,66 @@
+@model ContentGroupViewModel
+@using OrchardCore.ContentManagement
+@using OrchardCore.ContentManagement.Metadata
+@using OrchardCore.Mvc.Utilities
+@inject IContentDefinitionManager ContentDefinitionManager
+@{
+	ContentItem contentItem = Model.Shape.ContentItem;
+	var contentTypeDefinition = ContentDefinitionManager.GetTypeDefinition(contentItem.ContentType);
+	var typeDisplayName = contentTypeDefinition?.DisplayName ?? contentItem.ContentType.CamelFriendly();
+}
+	<style>
+		.validation-summary-valid ul {
+			padding: 0;
+			margin: 0;
+		}
+
+		.validation-summary-errors ul {
+			padding: 0;
+			margin: 0;
+		}
+	</style>
+
+<zone name="Title">
+	<div class="row">
+		<div class="col-12">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item"><a href="~/">首页</a></li>
+				<li class="breadcrumb-item"><a asp-route-action="List" asp-route-area="OrchardCore.Contents" asp-route-contentTypeId="@contentItem.ContentType">@Html.Raw(typeDisplayName)</a></li>
+				<li class="breadcrumb-item active">@(contentItem.Id == 0 ? "创建" : "编辑")</li>
+			</ol>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-12">
+			<h1 class="m-0 text-dark">@(contentItem.Id == 0 || string.IsNullOrWhiteSpace(contentItem.DisplayText) ? typeDisplayName : contentItem.DisplayText) - @Model.GroupName</h1>
+		</div>
+	</div>
+</zone>
+
+<section class="content">
+	<div class="container-fluid pt-3 pb-3">
+		<form asp-action="Edit" asp-route-contentItemId="@contentItem.ContentItemId" asp-route-returnUrl="@Context.Request.Query["ReturnUrl"]"
+			  asp-route-groupId="@Model.GroupId"
+			  method="post" enctype="multipart/form-data">
+			<div class="row">
+				<div class="col-12">@Html.ValidationSummary()</div>
+			</div>
+			@await DisplayAsync(Model.Shape)
+
+			<div class="edit-item-secondary group mt-3">
+				<div class="edit-item-actions form-group">
+					<button type="submit" name="submit" class="btn btn-success publish" value="submit">@T["保存"]</button>
+
+					@{
+						var returnUrl = Context.Request.Query["returnUrl"];
+					}
+
+					@if (!String.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
+					{
+						<a class="btn btn-secondary cancel" role="button" href="@returnUrl">@T["Cancel"]</a>
+					}
+				</div>
+			</div>
+		</form>
+	</div>
+</section>

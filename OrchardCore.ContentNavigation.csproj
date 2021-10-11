@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.2" />
+    <PackageReference Include="OrchardCore.ContentTypes.Abstractions" Version="1.1.0-preview" />
+    <PackageReference Include="OrchardCore.Module.Targets" Version="1.1.0-preview" />
+    <PackageReference Include="OrchardCore.ResourceManagement" Version="1.1.0-preview" />
+    <PackageReference Include="OrchardCore.Admin.Abstractions" Version="1.1.0-preview" />
+    <PackageReference Include="OrchardCore.ContentManagement.Display" Version="1.1.0-preview" />
+    <PackageReference Include="OrchardCore.DisplayManagement" Version="1.1.0-preview" />
+    <PackageReference Include="OrchardCore.Navigation.Core" Version="1.1.0-preview" />
+    <PackageReference Include="OrchardCore.Lists" Version="1.1.0-preview" />
+  </ItemGroup>
+</Project>
